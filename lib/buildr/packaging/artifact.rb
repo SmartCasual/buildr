@@ -347,6 +347,7 @@ module Buildr #:nodoc:
           spec = ARTIFACT_ATTRIBUTES.inject({}) { |h, k| h[k] = spec[k].to_s if spec[k] ; h }
           fail "Missing group identifier for #{spec.inspect}" unless spec[:group]
           fail "Missing artifact identifier for #{spec.inspect}" unless spec[:id]
+          spec[:version] = version_overrides["#{spec[:group]}:#{spec[:id]}:#{spec[:type]}"] || spec[:version]
           fail "Missing version for #{spec.inspect}" unless spec[:version]
           spec[:type] = (spec[:type] || DEFAULT_TYPE).to_sym
           spec
@@ -361,6 +362,14 @@ module Buildr #:nodoc:
         else
           fail 'Expecting a String, Hash or object that responds to to_spec'
         end
+      end
+
+      def version_overrides
+        @version_overrides ||= {}
+      end
+
+      def add_version_override(group:, id:, type:, version:)
+        version_overrides["#{group}:#{id}:#{type}"] = version
       end
 
       # :call-seq:
